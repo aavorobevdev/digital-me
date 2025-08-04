@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Syne } from 'next/font/google';
+import { Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
-const syne = Syne({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-syne',
+  variable: '--font-space-grotesk',
 });
 
 export const metadata: Metadata = {
@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${syne.variable} antialiased`}>{children}</body>
+    <html lang="en" className={`${spaceGrotesk.variable} bg-background text-foreground`}>
+      <body className="antialiased bg-background min-h-screen font-sans">{children}</body>
     </html>
   );
 }
