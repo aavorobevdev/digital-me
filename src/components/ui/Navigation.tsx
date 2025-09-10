@@ -15,6 +15,17 @@ interface NavigationProps {
   activeItem?: string;
 }
 
+const variants = {
+  visible: {
+    opacity: 1,
+    y: 0,
+  },
+  hidden: {
+    opacity: 0,
+    y: 100,
+  },
+};
+
 export function Navigation({ items, activeItem }: NavigationProps = {}) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
@@ -24,38 +35,32 @@ export function Navigation({ items, activeItem }: NavigationProps = {}) {
 
   return (
     <nav className="space-y-2">
-      {navigationItems.map((item) => {
-        const isActive = currentActiveItem === item.id;
+      {navigationItems.map((item, index) => {
         const isHovered = hoveredItem === item.id;
-        const showArrow = isActive || isHovered;
-        const shouldAnimate = isHovered && !isActive;
-
+        const isActive = isHovered || currentActiveItem === item.id;
         return (
-          <a
+          <motion.a
             key={item.id}
             href={item.href}
-            className={`block transition-colors duration-300 ease-in-out ${
-              isActive ? 'text-foreground' : 'text-foreground/60 hover:text-foreground'
-            }`}
+            className={`block transition-colors duration-300 ease-in-out`}
+            initial={'hidden'}
+            animate={'visible'}
+            variants={variants}
+            custom={index}
+            transition={{
+              delay: index * 0.1,
+              duration: 1,
+              ease: [0.4, 0, 0.2, 1],
+            }}
             onMouseEnter={() => setHoveredItem(item.id)}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <div className="flex items-center">
               <motion.div
                 className="relative w-6 h-4 flex items-center justify-center mr-2"
-                animate={
-                  shouldAnimate
-                    ? {
-                        opacity: [1, 0.5, 1],
-                      }
-                    : {
-                        scale: 1,
-                        rotate: 0,
-                        opacity: 1,
-                      }
-                }
+                whileHover={{ scale: 1, rotate: 0, opacity: 1 }}
                 transition={
-                  shouldAnimate
+                  isHovered
                     ? {
                         duration: 1.2,
                         ease: 'easeInOut',
@@ -68,7 +73,7 @@ export function Navigation({ items, activeItem }: NavigationProps = {}) {
                 <motion.div
                   className="absolute inset-0 flex items-center"
                   initial={false}
-                  animate={{ opacity: showArrow ? 0 : 1 }}
+                  animate={{ opacity: isHovered ? 0 : 1 }}
                   transition={{ duration: 0.2 }}
                 >
                   <div className="w-4 h-0.5 bg-foreground/30" />
@@ -77,15 +82,15 @@ export function Navigation({ items, activeItem }: NavigationProps = {}) {
                 <motion.div
                   className="absolute inset-0 flex items-center"
                   initial={false}
-                  animate={{ opacity: showArrow ? 1 : 0 }}
+                  animate={{ opacity: isActive ? 1 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
                   <motion.div
                     className="h-0.5 origin-left"
                     initial={false}
                     animate={{
-                      width: showArrow ? 16 : 0,
-                      backgroundColor: shouldAnimate
+                      width: isActive ? 16 : 0,
+                      backgroundColor: isActive
                         ? ['var(--accent)', 'var(--muted-foreground)', 'var(--accent)']
                         : 'var(--foreground)',
                     }}
@@ -108,9 +113,9 @@ export function Navigation({ items, activeItem }: NavigationProps = {}) {
                     }}
                     initial={false}
                     animate={{
-                      opacity: showArrow ? 1 : 0,
-                      scale: showArrow ? 1 : 0,
-                      borderLeftColor: shouldAnimate
+                      opacity: isActive ? 1 : 0,
+                      scale: isActive ? 1 : 0,
+                      borderLeftColor: isActive
                         ? ['var(--accent)', 'var(--muted-foreground)', 'var(--accent)']
                         : 'var(--foreground)',
                     }}
@@ -133,7 +138,7 @@ export function Navigation({ items, activeItem }: NavigationProps = {}) {
                 className="block"
                 initial={false}
                 animate={{
-                  x: showArrow ? 8 : 0,
+                  x: isActive ? 8 : 0,
                 }}
                 transition={{
                   duration: 0.3,
@@ -143,7 +148,7 @@ export function Navigation({ items, activeItem }: NavigationProps = {}) {
                 {item.label}
               </motion.span>
             </div>
-          </a>
+          </motion.a>
         );
       })}
     </nav>
